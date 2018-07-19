@@ -9,11 +9,16 @@ class ItemProgram(internalProviderClient: InternalProviderClient,
 
   def details(itemId: Long, userId: Long): IO[ItemDetails] = {
     for {
-      itemDetais <- internalProviderClient.detailsById(itemId)
+      itemDetails <- internalProviderClient.detailsById(itemId)
       user <- userClient.findById(userId)
     } yield {
-      ItemDetails(itemDetais.item, itemDetais.seller, user)
+      ItemDetails(itemDetails.item, itemDetails.seller, user)
     }
+  }
+  def detailsInParallel(itemId: Long, userId: Long): IO[ItemDetails] = {
+    import cats.syntax.parallel._
+    (internalProviderClient.detailsById(itemId), userClient.findById(userId))
+      .parMapN((itemDetails, user) => ItemDetails(itemDetails.item, itemDetails.seller, user))
   }
 
 }

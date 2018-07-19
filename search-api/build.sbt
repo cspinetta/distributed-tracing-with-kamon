@@ -26,18 +26,16 @@ scalacOptions ++= Seq(
 
 val Http4sVersion   = "0.18.11"
 val CirceVersion    = "0.9.3"
-val DoobieVersion   = "0.5.3"
 
 libraryDependencies ++= Seq(
   "org.http4s"              %%  "http4s-blaze-server"     % Http4sVersion,
   "org.http4s"              %%  "http4s-circe"            % Http4sVersion,
   "org.http4s"              %%  "http4s-dsl"              % Http4sVersion,
   "org.http4s"              %%  "http4s-blaze-client"     % Http4sVersion,
-  "org.tpolecat"            %%  "doobie-core"             % DoobieVersion,
-  "org.tpolecat"            %%  "doobie-h2"               % DoobieVersion,
+  "io.kamon"                %%  "kamon-http4s"            % "1.0.7",
+  "io.kamon"                %%  "kamon-zipkin"            % "1.0.0",
   "ch.qos.logback"          %   "logback-classic"         % "1.2.1",
   "com.github.pureconfig"   %%  "pureconfig"              % "0.7.1",
-  "org.mariadb.jdbc"        %   "mariadb-java-client"     % "1.5.9",
   "com.zaxxer"              %   "HikariCP"                % "2.6.2",
   "io.circe"                %%  "circe-generic"           % CirceVersion,
   "io.circe"                %%  "circe-java8"             % CirceVersion,

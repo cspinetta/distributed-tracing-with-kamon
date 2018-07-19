@@ -17,7 +17,8 @@ case class SearchService(client: Client[IO]) extends LogSupport {
 
     def route: HttpService[IO] = HttpService[IO] {
       case GET -> Root :? KeyWordParam(keyWord) => handleGetByKeyWord(keyWord)
-      case GET -> Root / "details" / LongVar(itemId) / LongVar(userId) => handleGetItemDetails(itemId, userId)
+      case GET -> Root / "details" / LongVar(itemId) / LongVar(userId)
+        :? InParallelParam(parallel) => handleGetItemDetails(itemId, userId, parallel.getOrElse(false))
     }
 
     def handleGetByKeyWord(keyWord: Option[String]): IO[Response[IO]] =
@@ -29,14 +30,20 @@ case class SearchService(client: Client[IO]) extends LogSupport {
           InternalServerError(message)
       }
 
-    def handleGetItemDetails(itemId: Long, userId: Long): IO[Response[IO]] =
-      itemProgram.details(itemId, userId: Long).attempt.flatMap {
+    def handleGetItemDetails(itemId: Long, userId: Long, parallel: Boolean): IO[Response[IO]] = {
+      val details = if (parallel) {
+        itemProgram.detailsInParallel(itemId, userId: Long)
+      } else {
+        itemProgram.details(itemId, userId: Long)
+      }
+      details.attempt.flatMap {
         case Right(result) => Ok(result.asJson)
         case Left(cause) =>
           val message = s"Error getting item details for [ItemId = $itemId, userId: $userId]. Cause: ${cause.getMessage}"
           log.error(message, cause)
           InternalServerError(message)
       }
+    }
 
     route
   }
@@ -45,4 +52,5 @@ case class SearchService(client: Client[IO]) extends LogSupport {
 object SearchService {
 
   case object KeyWordParam extends OptionalQueryParamDecoderMatcher[String]("key-word")
+  case object InParallelParam extends OptionalQueryParamDecoderMatcher[Boolean]("parallel")
 }

@@ -5,11 +5,14 @@ import java.util.concurrent.{ExecutorService, Executors}
 import cats.effect._
 import fs2.StreamApp.ExitCode
 import fs2.{Stream, StreamApp}
+import kamon.Kamon
 import kamon.demo.tracing.search.api.{HealthService, SearchService, UserService}
 import kamon.demo.tracing.search.client.{InternalProviderClient, UserClient}
-import kamon.demo.tracing.search.conf.ConfigSupport
+import kamon.demo.tracing.search.conf.{ConfigLoader, ConfigSupport}
 import kamon.demo.tracing.search.program.{ItemProgram, SearchProgram}
 import kamon.demo.tracing.search.utils.ThreadUtils._
+import kamon.http4s.middleware.server.{KamonSupport => KamonSupportS}
+import kamon.http4s.middleware.client.{KamonSupport => KamonSupportC}
 import org.http4s._
 import org.http4s.client.Client
 import org.http4s.client.blaze.{BlazeClientConfig, Http1Client}
@@ -21,12 +24,12 @@ import scala.concurrent.ExecutionContext
 
 object Server extends StreamApp[IO] with ConfigSupport with Programs with ClientFactory {
 
-  private val executor : ExecutorService  = Executors.newFixedThreadPool(30, namedThreadFactory("demo-server-pool"))
+  private val executor : ExecutorService  = Executors.newFixedThreadPool(30, namedThreadFactory("search-server-pool"))
   implicit val ec: ExecutionContext = ExecutionContext.fromExecutor(executor)
 
   override def stream(args: List[String], requestShutdown: IO[Unit]): Stream[IO, ExitCode] = {
 
-    def router(client: Client[IO]): HttpService[IO] = {
+    def router(client: Client[IO]): HttpService[IO] = KamonSupportS {
       Logger(logHeaders = true, logBody = false) {
         Router[IO](mappings =
           "/api/search/health-check"  -> HealthService().service(),
@@ -37,12 +40,18 @@ object Server extends StreamApp[IO] with ConfigSupport with Programs with Client
     }
 
     for {
+      _ <-  Stream.eval(Sync[IO].delay(initKamon()))
       client   <- httpClient
       exitCode <- BlazeBuilder[IO]
         .bindHttp(config.server.port, config.server.host)
         .mountService(router(client))
         .serve
     } yield exitCode
+  }
+
+  def initKamon(): Unit = {
+    Kamon.reconfigure(ConfigLoader.configuration)
+    Kamon.loadReportersFromConfig()
   }
 }
 
@@ -62,5 +71,7 @@ trait ClientFactory extends ConfigSupport {
     idleTimeout = config.client.idleTimeout,
     requestTimeout = config.client.requestTimeout
   )
-  def httpClient: Stream[IO, Client[IO]] = Http1Client.stream[IO](clientConfig)
+  def httpClient: Stream[IO, Client[IO]] = Http1Client
+    .stream[IO](clientConfig)
+    .map(client => KamonSupportC(client))
 }

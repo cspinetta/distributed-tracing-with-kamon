@@ -37,5 +37,4 @@ public class Item {
     public static Item of(String title, Category category, Long sellerId) {
         return new Item(null, title, category, sellerId);
     }
-
 }

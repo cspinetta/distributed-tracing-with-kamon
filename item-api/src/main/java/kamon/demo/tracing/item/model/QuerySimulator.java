@@ -80,7 +80,7 @@ public class QuerySimulator {
 
     private static int getRandom(int max){
         int i = (int) (Math.random() * max);
-        System.out.println("RandomTime " + i);
+//        System.out.println("RandomTime " + i);
         return i;
     }
 

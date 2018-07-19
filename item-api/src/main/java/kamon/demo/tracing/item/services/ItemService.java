@@ -1,8 +1,5 @@
 package kamon.demo.tracing.item.services;
 
-import java.util.Optional;
-
-import kamon.Kamon;
 import kamon.annotation.api.SpanCustomizer;
 import kamon.demo.tracing.item.model.DetailItem;
 import kamon.demo.tracing.item.model.Item;
@@ -11,13 +8,19 @@ import kamon.demo.tracing.item.model.SearchFilter;
 import kamon.demo.tracing.item.repositories.ItemRepository;
 import kamon.demo.tracing.item.repositories.SellerRepository;
 import lombok.val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class ItemService {
+
+    private static Logger logger = LoggerFactory.getLogger(ItemService.class);
 
     @Autowired
     ItemRepository itemRepository;
@@ -38,7 +41,7 @@ public class ItemService {
     }
 
     public Optional<DetailItem> details(Long id) {
-        System.out.println("Kamon Context " + Kamon.currentContext());
+        logger.info("getting item with id: " + id);
         QuerySimulator.runInParallelN(5);
 //        QuerySimulator.runN(5);
         return itemRepository

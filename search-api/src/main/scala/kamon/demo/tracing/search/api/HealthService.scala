@@ -10,7 +10,7 @@ class HealthService extends LogSupport {
 
   def service(): HttpService[IO] = {
     def route = HttpService[IO] {
-      case GET -> Root / "health-check" => Ok(fullVersion)
+      case GET -> Root => Ok(fullVersion)
     }
     route
   }

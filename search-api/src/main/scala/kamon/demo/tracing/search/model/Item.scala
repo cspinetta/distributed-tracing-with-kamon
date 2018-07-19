@@ -1,15 +1,30 @@
 package kamon.demo.tracing.search.model
 
-import io.circe.generic.extras.Configuration
-import io.circe.generic.extras.semiauto.{deriveDecoder, deriveEncoder}
-import io.circe.{Decoder, Encoder}
+import java.time.{LocalDate, LocalDateTime}
+
+import io.circe.generic.extras.{Configuration, ConfiguredJsonCodec}
+import io.circe.java8.time.TimeInstances
+import kamon.demo.tracing.search.utils.CirceApiConfig
 import kamon.demo.tracing.search.utils.CirceUtils.circeApiConfig
 
+
+@ConfiguredJsonCodec
 case class Item(id: Long, title: String, category: String, sellerId: Long)
 
 object Item {
   implicit val customConfig: Configuration = circeApiConfig
-
-  implicit val encoder: Encoder[Item] = deriveEncoder
-  implicit val decoder: Decoder[Item] = deriveDecoder
 }
+
+@ConfiguredJsonCodec
+case class ItemDetails(item: Item, seller: Seller, user: User)
+
+@ConfiguredJsonCodec
+case class Seller(id: Long, firstName: String, lastName: String,
+                  birthday: LocalDate, category: String,
+                  registrationDate: LocalDateTime, grade: BigDecimal)
+
+@ConfiguredJsonCodec case class User(id: Long, email: String)
+
+object ItemDetails extends CirceApiConfig
+object Seller extends CirceApiConfig with TimeInstances
+object User extends CirceApiConfig

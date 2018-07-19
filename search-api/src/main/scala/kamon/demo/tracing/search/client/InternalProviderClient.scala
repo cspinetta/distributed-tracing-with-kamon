@@ -1,10 +1,9 @@
 package kamon.demo.tracing.search.client
 
 import cats.effect.IO
-import io.circe.{Decoder, Encoder}
-import io.circe.generic.extras.semiauto._
+import io.circe.generic.extras.ConfiguredJsonCodec
 import kamon.demo.tracing.search.conf.ConfigSupport
-import kamon.demo.tracing.search.model.{Filter, Item}
+import kamon.demo.tracing.search.model.{Filter, Item, Seller}
 import kamon.demo.tracing.search.utils._
 import org.http4s.Uri
 import org.http4s.client.Client
@@ -14,40 +13,34 @@ class InternalProviderClient(client: Client[IO]) extends ConfigSupport {
   import InternalProviderClient._
   import UriUtils._
 
-  private val c = config.service.internalProvider
+  private val c = config.service.itemApi
   private lazy val uriPrototype = Uri.fromString(s"${c.host}${c.endpoint}")
 
-  def searchByFilter(filter: Filter): IO[Result[List[Item]]] = {
+  def searchByFilter(filter: Filter): IO[List[Item]] = {
     val uri = uriPrototype.map(uri =>
       (uri / "search")
-      .withOptionQueryParam("key-word", filter.keyWord)
-    ).parse
-    client.expect(uri)(jsonOf[IO, Response]).attempt.map(parseResult)
+      .withOptionQueryParam("key-word", filter.keyWord)).parse
+    client
+      .expect(uri)(jsonOf[IO, ItemsResponse])
+      .map(_.content)
   }
 
-  def searchByHotSale(categories: List[String]): IO[Result[List[Item]]] = {
-    val uri = uriPrototype.map(_
-      .withPath("/hot-sale")
-      .withQueryParam("category", categories)
-    ).parse
-    client.expect(uri)(jsonOf[IO, Response]).attempt.map(parseResult)
+  def detailsById(itemId: Long): IO[ItemDetailsResponse] = {
+    val uri = uriPrototype.map(uri => uri / s"$itemId" / "details").parse
+    client.expect(uri)(jsonOf[IO, ItemDetailsResponse])
   }
-
-  def parseResult(response: Result[Response]): Result[List[Item]] =
-    response.map(_.content)
 
 }
 
 object InternalProviderClient {
-
   type Result[T] = Either[Throwable, T]
 
-  case class Response(content: List[Item])
+  @ConfiguredJsonCodec
+  case class ItemsResponse(content: List[Item])
+  object ItemDetailsResponse  extends CirceApiConfig
 
-  object Response {
-    import Item._
+  @ConfiguredJsonCodec
+  case class ItemDetailsResponse(item: Item, seller: Seller)
+  object ItemsResponse extends CirceApiConfig
 
-    implicit val encoder: Encoder[Response] = deriveEncoder
-    implicit val decoder: Decoder[Response] = deriveDecoder
-  }
 }

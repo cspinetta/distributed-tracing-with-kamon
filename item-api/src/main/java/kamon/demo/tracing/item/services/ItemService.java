@@ -8,6 +8,8 @@ import kamon.demo.tracing.item.model.SearchFilter;
 import kamon.demo.tracing.item.repositories.ItemRepository;
 import kamon.demo.tracing.item.repositories.SellerRepository;
 import lombok.val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +17,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ItemService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ItemService.class);
 
     @Autowired
     ItemRepository itemRepository;
@@ -38,9 +42,14 @@ public class ItemService {
     public Optional<DetailItem> details(Long id) {
         return itemRepository
             .findById(id)
-            .flatMap((item) -> {
-                val seller = sellerRepository.findById(item.getId());
-                return seller.map((s) -> DetailItem.of(item, s));
+            .map((item) -> {
+                try {
+                    val seller = sellerRepository.findById(item.getSellerId());
+                    return DetailItem.of(item, seller);
+                } catch (Throwable exc) {
+                    logger.error("Error trying to retrieve seller: " + item.getSellerId(), exc);
+                    return DetailItem.of(item, Optional.empty());
+                }
             });
     }
 }

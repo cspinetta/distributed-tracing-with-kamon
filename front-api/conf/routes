@@ -1,0 +1,4 @@
+
+GET   /api/front/search                      kamon.demo.tracing.front.controllers.ItemsController.search
+GET   /api/front/details/:itemId/:userId     kamon.demo.tracing.front.controllers.ItemsController.details(itemId: Long, userId: Long)
+GET   /api/front/user/:userId                kamon.demo.tracing.front.controllers.UserController.user(userId: Long)

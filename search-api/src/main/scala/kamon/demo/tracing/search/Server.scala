@@ -11,6 +11,7 @@ import kamon.demo.tracing.search.client.{InternalProviderClient, UserClient}
 import kamon.demo.tracing.search.conf.{ConfigLoader, ConfigSupport}
 import kamon.demo.tracing.search.program.{ItemProgram, SearchProgram}
 import kamon.demo.tracing.search.utils.ThreadUtils._
+import kamon.executors.util.ContextAwareExecutorService
 import kamon.http4s.middleware.server.{KamonSupport => KamonSupportS}
 import kamon.http4s.middleware.client.{KamonSupport => KamonSupportC}
 import org.http4s._
@@ -24,7 +25,7 @@ import scala.concurrent.ExecutionContext
 
 object Server extends StreamApp[IO] with ConfigSupport with Programs with ClientFactory {
 
-  private val executor : ExecutorService  = Executors.newFixedThreadPool(30, namedThreadFactory("search-server-pool"))
+  private val executor : ExecutorService  = ContextAwareExecutorService(Executors.newFixedThreadPool(30, namedThreadFactory("search-server-pool")))
   implicit val ec: ExecutionContext = ExecutionContext.fromExecutor(executor)
 
   override def stream(args: List[String], requestShutdown: IO[Unit]): Stream[IO, ExitCode] = {

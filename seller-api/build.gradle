@@ -58,6 +58,7 @@ dependencies {
 //    compile "io.kamon:kamon-spring_2.12:0.0.1-09d1c25c4a6dd536879bf1b8ae8b162d89d2f9cd"
     compile "io.kamon:kamon-servlet-3.x.x_2.12:0.0.1-47bde0196f00c0c236b27ce9706fce6bdc3c500a"
     compile 'io.kamon:kamon-zipkin_2.12:1.0.0'
+    compile 'io.kamon:kamon-jaeger_2.12:1.0.0'
     compile 'io.kamon:kamon-annotation-api:1.0.1'
     compile 'io.kamon:kanela-kotlin-extension:0.0.10'
 

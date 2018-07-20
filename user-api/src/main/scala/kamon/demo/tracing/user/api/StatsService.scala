@@ -38,7 +38,7 @@ case class StatsService(ec: ContextAwareExecutorService) extends LogSupport {
         .start()
       Kamon.withContext(Kamon.currentContext().withKey(Span.ContextKey, statsExecutionSpan)) {
         Thread.sleep(r.nextInt(MaxTimeExecuting.toMillis.toInt))
-        Kamon.currentContext().get(Span.ContextKey).finish()
+        Kamon.currentSpan().finish()
       }
     })
   }

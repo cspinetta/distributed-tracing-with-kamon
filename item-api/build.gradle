@@ -61,6 +61,7 @@ dependencies {
 
     compile "io.kamon:kamon-spring_2.12:1.0.0-5e80f9df8d3da970efabe22a25539dda8d461faf"
     compile 'io.kamon:kamon-zipkin_2.12:1.0.0'
+    compile 'io.kamon:kamon-jaeger_2.12:1.0.0'
     compile 'io.kamon:kamon-annotation-api:1.0.1'
 
     runtime 'com.h2database:h2'

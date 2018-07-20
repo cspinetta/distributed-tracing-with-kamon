@@ -34,6 +34,7 @@ libraryDependencies ++= Seq(
   "org.http4s"              %%  "http4s-blaze-client"     % Http4sVersion,
   "io.kamon"                %%  "kamon-http4s"            % "1.0.7",
   "io.kamon"                %%  "kamon-zipkin"            % "1.0.0",
+  "io.kamon"                %%  "kamon-jaeger"            % "1.0.0",
   "io.kamon"                %%  "kamon-executors"         % "1.0.0",
   "ch.qos.logback"          %   "logback-classic"         % "1.2.1",
   "com.github.pureconfig"   %%  "pureconfig"              % "0.7.1",

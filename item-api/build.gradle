@@ -29,6 +29,9 @@ repositories {
     mavenLocal()
     mavenCentral()
     jcenter()
+    jcenter{
+        url 'https://dl.bintray.com/kamon-io/snapshots'
+    }
 //    ivy {
 //        url "${System.properties['user.home']}/.ivy2/local"
 //        layout 'ivy'
@@ -56,7 +59,7 @@ dependencies {
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.4'
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.4'
 
-    compile "io.kamon:kamon-spring_2.12:0.0.1-09d1c25c4a6dd536879bf1b8ae8b162d89d2f9cd"
+    compile "io.kamon:kamon-spring_2.12:1.0.0-5e80f9df8d3da970efabe22a25539dda8d461faf"
     compile 'io.kamon:kamon-zipkin_2.12:1.0.0'
     compile 'io.kamon:kamon-annotation-api:1.0.1'
 

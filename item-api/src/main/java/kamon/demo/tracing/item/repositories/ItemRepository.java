@@ -13,5 +13,4 @@ public interface ItemRepository extends PagingAndSortingRepository<Item, Long> {
     @SpanCustomizer(operationName = "item.searchByFilter")
     @Query("from Item p where lower(p.title) like lower(concat('%', :keyword, '%'))")
     Page<Item> findByFilter(@Param("keyword") String keyWord, Pageable pageable);
-
 }

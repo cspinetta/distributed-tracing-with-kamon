@@ -30,7 +30,7 @@ class ItemsService @Inject()(itemsRepository: ItemsRepository, userRepository: U
 }
 
 @Singleton
-class FixItemsService @Inject()(itemsRepository: ItemsRepository, userRepository: UserRepository)(implicit ec: ExecutionContext) {
+class ParallelItemsService @Inject()(itemsRepository: ItemsRepository, userRepository: UserRepository)(implicit ec: ExecutionContext) {
 
   def findByFilter(filter: ItemsFilter, userId: Long)(implicit mc: MarkerContext): Future[ItemsResult] = {
     val itemsFuture = itemsRepository.search(filter)

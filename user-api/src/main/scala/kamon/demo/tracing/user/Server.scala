@@ -6,14 +6,14 @@ import cats.effect._
 import fs2.StreamApp.ExitCode
 import fs2.{Stream, StreamApp}
 import kamon.Kamon
-import kamon.demo.tracing.user.api.{HealthService, SearchService, UserService}
-import kamon.demo.tracing.user.client.{InternalProviderClient, UserClient}
+import kamon.demo.tracing.user.api.{HealthService, StatsService, UserService}
+import kamon.demo.tracing.user.client.StatsClient
 import kamon.demo.tracing.user.conf.{ConfigLoader, ConfigSupport}
-import kamon.demo.tracing.user.program.{ItemProgram, SearchProgram}
+import kamon.demo.tracing.user.program.UserProgram
 import kamon.demo.tracing.user.utils.ThreadUtils._
 import kamon.executors.util.ContextAwareExecutorService
-import kamon.http4s.middleware.server.{KamonSupport => KamonSupportS}
 import kamon.http4s.middleware.client.{KamonSupport => KamonSupportC}
+import kamon.http4s.middleware.server.{KamonSupport => KamonSupportS}
 import org.http4s._
 import org.http4s.client.Client
 import org.http4s.client.blaze.{BlazeClientConfig, Http1Client}
@@ -25,8 +25,10 @@ import scala.concurrent.ExecutionContext
 
 object Server extends StreamApp[IO] with ConfigSupport with Programs with ClientFactory {
 
-  private val executor : ExecutorService  = ContextAwareExecutorService(Executors.newFixedThreadPool(30, namedThreadFactory("search-server-pool")))
+  private val executor: ExecutorService = ContextAwareExecutorService(Executors.newFixedThreadPool(30, namedThreadFactory("search-server-pool")))
   implicit val ec: ExecutionContext = ExecutionContext.fromExecutor(executor)
+
+  private val statsExecutor = ContextAwareExecutorService(Executors.newFixedThreadPool(8, namedThreadFactory("stats-execution-pool")))
 
   override def stream(args: List[String], requestShutdown: IO[Unit]): Stream[IO, ExitCode] = {
 
@@ -34,8 +36,8 @@ object Server extends StreamApp[IO] with ConfigSupport with Programs with Client
       Logger(logHeaders = true, logBody = false) {
         Router[IO](mappings =
           "/api/user/health-check"  -> HealthService().service(),
-          "/api/user/search"        -> SearchService(client).service(searchProgram(client), itemProgram(client)),
-          "/api/user"               -> UserService.service
+          "/api/user"               -> UserService(userProgram(client)).service,
+          "/api/stats/user"         -> StatsService(statsExecutor).service
         )
       }
     }
@@ -57,13 +59,11 @@ object Server extends StreamApp[IO] with ConfigSupport with Programs with Client
 }
 
 trait Clients {
-  def internalProviderClient(client: Client[IO]): InternalProviderClient = new InternalProviderClient(client)
-  def userClient(client: Client[IO]): UserClient = new UserClient(client)
+  def statsClient(client: Client[IO]): StatsClient = new StatsClient(client)
 }
 
 trait Programs extends Clients {
-  def searchProgram(client: Client[IO]) = new SearchProgram(internalProviderClient(client))
-  def itemProgram(client: Client[IO]) = new ItemProgram(internalProviderClient(client), userClient(client))
+  def userProgram(client: Client[IO]) = new UserProgram(statsClient(client))
 }
 
 trait ClientFactory extends ConfigSupport {

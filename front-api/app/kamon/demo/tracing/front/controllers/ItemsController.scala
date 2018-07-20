@@ -25,18 +25,18 @@ class ItemsController @Inject()(cc: ApiControllerComponents)(implicit ec: Execut
   }
 }
 
-class FixItemsController @Inject()(cc: ApiControllerComponents)(implicit ec: ExecutionContext)
+class ParallelItemsController @Inject()(cc: ApiControllerComponents)(implicit ec: ExecutionContext)
     extends ApiBaseController(cc) with LogSupport {
 
   def search: Action[AnyContent] = ApiAction.async { implicit request =>
     val keyWord = request.getQueryString("key-word")
-    fixItemsService.findByFilter(ItemsFilter(keyWord), userId = 32).map { itemsResult =>
+    parallelItemsService.findByFilter(ItemsFilter(keyWord), userId = 32).map { itemsResult =>
       Ok(SnakeCaseSerializer.write(itemsResult))
     }
   }
 
   def details(itemId: Long, userId: Long): Action[AnyContent] = ApiAction.async { implicit request =>
-    fixItemsService.details(itemId, userId).map { itemDetails =>
+    parallelItemsService.details(itemId, userId).map { itemDetails =>
       Ok(SnakeCaseSerializer.write(itemDetails))
     }
   }

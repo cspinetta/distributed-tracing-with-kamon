@@ -1,13 +1,15 @@
 package kamon.demo.tracing.user.api
 
 import cats.effect.IO
-import kamon.demo.tracing.user.model.User
-import kamon.demo.tracing.user.utils.LogSupport
 import io.circe.syntax._
+import kamon.demo.tracing.user.program.UserProgram
+import kamon.demo.tracing.user.utils.LogSupport
 import org.http4s._
 import org.http4s.dsl.io._
 
-case object UserService extends LogSupport {
+import scala.util.control.NonFatal
+
+case class UserService(userProgram: UserProgram) extends LogSupport {
   import kamon.demo.tracing.user.utils.CirceUtils.circeCustomSyntax._
 
   def service: HttpService[IO] = {
@@ -17,8 +19,17 @@ case object UserService extends LogSupport {
     }
 
     def handleGetUser(userId: Long): IO[Response[IO]] = {
-      if (userId < 100) Ok(User(id = userId, email = s"user-$userId@domain.com").asJson)
-      else              NotFound(())
+      userProgram
+        .findById(userId)
+        .attempt
+        .flatMap {
+          case Right(Some(user)) => Ok(user.asJson)
+          case Right(None) => NotFound(())
+          case Left(NonFatal(exception)) =>
+            val message = s"Error getting user by ID for [UserId = $userId]. Cause: ${exception.getMessage}"
+            log.error(message, exception)
+            InternalServerError(message)
+        }
     }
 
     route

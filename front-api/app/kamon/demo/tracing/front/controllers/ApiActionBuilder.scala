@@ -1,7 +1,7 @@
 package kamon.demo.tracing.front.controllers
 
 import javax.inject.Inject
-import kamon.demo.tracing.front.base.WSExtension.{InternalServerErrorException, ResourceNotFoundException, ServiceUnavailableException, UnauthorizedException}
+import kamon.demo.tracing.front.service.{ItemsService, ParallelItemsService}
 import net.logstash.logback.marker.LogstashMarker
 import play.api.http.{FileMimeTypes, HttpVerbs}
 import play.api.i18n.{Langs, MessagesApi}
@@ -9,26 +9,16 @@ import play.api.libs.concurrent.Futures
 import play.api.libs.concurrent.Futures._
 import play.api.mvc._
 import play.api.{Logger, MarkerContext}
-import kamon.demo.tracing.front.service.{FixItemsService, ItemsService}
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
-import scala.util.parsing.json.JSON
 
-/**
-  * A wrapped request for post resources.
-  *
-  * This is commonly used to hold request-specific information like
-  * security credentials, and useful shortcut methods.
-  */
+
 trait ApiRequestHeader extends MessagesRequestHeader with PreferredMessagesProvider
 class ApiRequest[A](request: Request[A], val messagesApi: MessagesApi) extends WrappedRequest(request) with ApiRequestHeader
 
-/**
- * Provides an implicit marker that will show the request in all logger statements.
- */
 trait RequestMarkerContext {
   import net.logstash.logback.marker.Markers
 
@@ -46,13 +36,6 @@ trait RequestMarkerContext {
 
 }
 
-/**
-  * The action builder for the Post resource.
-  *
-  * This is the place to put logging, metrics, to augment
-  * the request with contextual data, and manipulate the
-  * result.
-  */
 class ApiActionBuilder @Inject()(messagesApi: MessagesApi, playBodyParsers: PlayBodyParsers)
                                 (implicit val executionContext: ExecutionContext, futures: Futures)
     extends ActionBuilder[ApiRequest, AnyContent]
@@ -89,15 +72,9 @@ class ApiActionBuilder @Inject()(messagesApi: MessagesApi, playBodyParsers: Play
   }
 }
 
-/**
- * Packages up the component dependencies for the post controller.
- *
- * This is a good way to minimize the surface area exposed to the controller, so the
- * controller only has to have one thing injected.
- */
 case class ApiControllerComponents @Inject()(apiActionBuilder: ApiActionBuilder,
                                              itemsService: ItemsService,
-                                             fixItemsService: FixItemsService,
+                                             parallelItemsService: ParallelItemsService,
                                              actionBuilder: DefaultActionBuilder,
                                              parsers: PlayBodyParsers,
                                              messagesApi: MessagesApi,
@@ -112,5 +89,5 @@ class ApiBaseController @Inject()(pcc: ApiControllerComponents) extends BaseCont
   def ApiAction: ApiActionBuilder = pcc.apiActionBuilder
 
   def itemsService: ItemsService = pcc.itemsService
-  def fixItemsService: FixItemsService = pcc.fixItemsService
+  def parallelItemsService: ParallelItemsService = pcc.parallelItemsService
 }

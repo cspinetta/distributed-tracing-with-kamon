@@ -14,12 +14,10 @@ object Config extends ConfigLoader {
 
   case class ClientConfig(maxTotalConnections: Int, idleTimeout: FiniteDuration, requestTimeout: FiniteDuration)
   case class ServerConfig(host: String, port: Int)
-  case class ServiceConfig(itemApi: ServiceConfig.ItemApi,
-                           userApi: ServiceConfig.UserApi)
+  case class ServiceConfig(statsApi: ServiceConfig.StatsApi)
 
   object ServiceConfig {
-    case class ItemApi(host: String, endpoint: String)
-    case class UserApi(host: String, endpoint: String)
+    case class StatsApi(host: String, endpoint: String)
   }
 
   lazy val appConfig: AppConfig = pureconfig.loadConfigOrThrow[AppConfig](config)

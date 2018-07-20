@@ -1,4 +1,8 @@
 
-GET   /api/front/search                      kamon.demo.tracing.front.controllers.ItemsController.search
-GET   /api/front/details/:itemId/:userId     kamon.demo.tracing.front.controllers.ItemsController.details(itemId: Long, userId: Long)
-GET   /api/front/user/:userId                kamon.demo.tracing.front.controllers.UserController.user(userId: Long)
+GET   /api/front/search                                kamon.demo.tracing.front.controllers.ItemsController.search
+GET   /api/front/details/item/:itemId/user/:userId     kamon.demo.tracing.front.controllers.ItemsController.details(itemId: Long, userId: Long)
+
+GET   /api/front/fix/search                                kamon.demo.tracing.front.controllers.FixItemsController.search
+GET   /api/front/fix/details/item/:itemId/user/:userId     kamon.demo.tracing.front.controllers.FixItemsController.details(itemId: Long, userId: Long)
+
+GET   /api/front/user/:userId                          kamon.demo.tracing.front.controllers.UserController.user(userId: Long)

@@ -1,6 +1,7 @@
 package kamon.demo.tracing.front.controllers
 
 import javax.inject.Inject
+import kamon.demo.tracing.front.base.WSExtension.{InternalServerErrorException, ResourceNotFoundException, ServiceUnavailableException, UnauthorizedException}
 import net.logstash.logback.marker.LogstashMarker
 import play.api.http.{FileMimeTypes, HttpVerbs}
 import play.api.i18n.{Langs, MessagesApi}
@@ -8,10 +9,12 @@ import play.api.libs.concurrent.Futures
 import play.api.libs.concurrent.Futures._
 import play.api.mvc._
 import play.api.{Logger, MarkerContext}
-import kamon.demo.tracing.front.service.ItemsService
+import kamon.demo.tracing.front.service.{FixItemsService, ItemsService}
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
+import scala.util.{Failure, Success}
 import scala.util.parsing.json.JSON
 
 /**
@@ -70,14 +73,19 @@ class ApiActionBuilder @Inject()(messagesApi: MessagesApi, playBodyParsers: Play
     logger.info(s"Request: ${request.uri} [${request.method}]")
 
     block(new ApiRequest(request, messagesApi))
-      .map { result =>
-        (request.method match {
-          case GET | HEAD =>
-            result.withHeaders("Cache-Control" -> s"max-age: 100")
-          case _ =>
-            result
-        }).as("application/json")
-      }.withTimeout(20.seconds)
+      .transform {
+        case Success(result) =>
+          Success((request.method match {
+            case GET | HEAD =>
+              result.withHeaders("Cache-Control" -> s"max-age: 100")
+            case _ =>
+              result
+          }).as("application/json"))
+        case Failure(NonFatal(exception)) =>
+          logger.error(s"Error occurs trying to response to ${request.uri}", exception)
+          Success(Results.InternalServerError(s"We failed due to an internal error. Cause: ${exception.getMessage}"))
+      }
+      .withTimeout(20.seconds)
   }
 }
 
@@ -89,6 +97,7 @@ class ApiActionBuilder @Inject()(messagesApi: MessagesApi, playBodyParsers: Play
  */
 case class ApiControllerComponents @Inject()(apiActionBuilder: ApiActionBuilder,
                                              itemsService: ItemsService,
+                                             fixItemsService: FixItemsService,
                                              actionBuilder: DefaultActionBuilder,
                                              parsers: PlayBodyParsers,
                                              messagesApi: MessagesApi,
@@ -103,4 +112,5 @@ class ApiBaseController @Inject()(pcc: ApiControllerComponents) extends BaseCont
   def ApiAction: ApiActionBuilder = pcc.apiActionBuilder
 
   def itemsService: ItemsService = pcc.itemsService
+  def fixItemsService: FixItemsService = pcc.fixItemsService
 }

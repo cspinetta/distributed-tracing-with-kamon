@@ -17,7 +17,6 @@ class UserRepository @Inject() (ws: WSClient)(implicit ec: ItemsExecutionContext
   val c: ServiceConfig.UserApi = config.service.userApi
 
   def findById(userId: Long)(implicit mc: MarkerContext): Future[User] = {
-    log.trace(s"get: userId = $userId")
     val r = ws
       .get(s"${c.host}${c.endpoint}/$userId")
       .withRequestTimeout(c.timeout)

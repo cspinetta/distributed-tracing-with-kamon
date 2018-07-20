@@ -41,11 +41,6 @@ object WSExtension extends LogSupport {
 
   trait PimpWSResponse extends LogSupport {
 
-    case class UnauthorizedException(message: String) extends RuntimeException(message) with NoStackTrace
-    case class ResourceNotFoundException(message: String) extends RuntimeException(message) with NoStackTrace
-    case class InternalServerErrorException(message: String) extends RuntimeException(message) with NoStackTrace
-    case class ServiceUnavailableException(message: String) extends RuntimeException(message) with NoStackTrace
-
     implicit def WSRequest(wsResponse: Future[WSResponse]) = new {
 
       def handleAsync[A <: AnyRef](implicit mf: Manifest[A], ec: ExecutionContext): Future[A] = {
@@ -69,23 +64,29 @@ object WSExtension extends LogSupport {
       }
 
       private def process[A <: AnyRef](response: WSResponse)(implicit mf: Manifest[A]): Try[A] = {
+        def withBody(msg: String): String = if (Option(response.body).exists(_.nonEmpty)) s"$msg - ${response.body}" else msg
         response.status match {
           case 200 ⇒
             Try(SnakeCaseSerializer.read[A](response.body))
           case 401 ⇒
-            Failure(UnauthorizedException("401 - Unauthorized"))
+            Failure(UnauthorizedException(withBody(s"401 - Unauthorized")))
           case 404 ⇒
-            Failure(ResourceNotFoundException("404 - Requested resource has not been found"))
+            Failure(ResourceNotFoundException(withBody(s"404 - Requested resource has not been found")))
           case 500 ⇒
-            Failure(InternalServerErrorException("500 - Internal Server Error"))
+            Failure(InternalServerErrorException(withBody(s"500 - Internal Server Error")))
           case 503 ⇒
-            Failure(ServiceUnavailableException("503 - Server is in maintenance"))
+            Failure(ServiceUnavailableException(withBody(s"503 - Server is in maintenance")))
           case _ ⇒
-            Failure(new RuntimeException(s"http response status: ${response.status} - ${response.statusText} - ${response.body}"))
+            Failure(new RuntimeException(withBody(s"http response status: ${response.status} - ${response.statusText}")))
         }
       }
     }
   }
+
+  case class UnauthorizedException(message: String) extends RuntimeException(message) with NoStackTrace
+  case class ResourceNotFoundException(message: String) extends RuntimeException(message) with NoStackTrace
+  case class InternalServerErrorException(message: String) extends RuntimeException(message) with NoStackTrace
+  case class ServiceUnavailableException(message: String) extends RuntimeException(message) with NoStackTrace
 
 }
 

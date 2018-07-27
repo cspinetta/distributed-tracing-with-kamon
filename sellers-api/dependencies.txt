@@ -1,0 +1,16 @@
+:dependencies
+
+------------------------------------------------------------
+Root project
+------------------------------------------------------------
+
+agent
+\--- io.kamon:kanela-agent:0.0.12-6f56711e5ee41e3e48beab70ad43f77dd09ee725
+
+apiElements - API elements for main. (n)
+No dependencies
+
+archives - Configuration for archive artifacts.
+No dependencies
+
+compile - Dependencies for source set 'main' (deprecated, use 'implementation ' instead).

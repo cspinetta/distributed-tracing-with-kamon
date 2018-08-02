@@ -35,6 +35,9 @@ repositories {
     mavenLocal()
     mavenCentral()
     jcenter()
+    jcenter {
+        url 'https://dl.bintray.com/kamon-io/releases'
+    }
 }
 
 configurations {
@@ -66,11 +69,10 @@ dependencies {
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.4'
     compile 'com.github.kittinunf.fuel:fuel:1.8.0'
 
-//    compile "io.kamon:kamon-spring_2.12:0.0.1-09d1c25c4a6dd536879bf1b8ae8b162d89d2f9cd"
-    compile "io.kamon:kamon-servlet-3.x.x_2.12:0.0.1-47bde0196f00c0c236b27ce9706fce6bdc3c500a"
+    compile "io.kamon:kamon-servlet-3_2.12:1.0.0"
     compile 'io.kamon:kamon-zipkin_2.12:1.0.0'
     compile 'io.kamon:kamon-jaeger_2.12:1.0.0'
-    compile 'io.kamon:kamon-annotation-api:1.0.2-9a7310ef9dd279b32fe998a2153a1c3d71f854cd'
+    compile 'io.kamon:kamon-annotation-api:1.0.2'
     compile 'io.kamon:kanela-kotlin-extension:0.0.10'
 
     provided(kamon_agent_dep)

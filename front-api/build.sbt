@@ -13,8 +13,8 @@ libraryDependencies += ws
 libraryDependencies += "io.kamon"                      %%  "kamon-core"              % "1.1.3"
 libraryDependencies += "io.kamon"                      %   "kamon-annotation-api"    % "1.0.2"
 libraryDependencies += "io.kamon"                      %%  "kamon-zipkin"            % "1.0.0"
-libraryDependencies += "io.kamon"                      %%  "kamon-jaeger"            % "1.0.0"
-libraryDependencies += "io.kamon"                      %   "kanela-agent-bundle"     % "0.0.12" % Provided
+libraryDependencies += "io.kamon"                      %%  "kamon-jaeger"            % "1.0.2"
+libraryDependencies += "io.kamon"                      %   "kanela-agent-bundle"     % "0.0.14" % Provided
 
 libraryDependencies += "org.joda"                      %  "joda-convert"             % "1.9.2"
 libraryDependencies += "net.logstash.logback"          %  "logstash-logback-encoder" % "4.11"

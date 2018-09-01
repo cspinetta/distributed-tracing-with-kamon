@@ -14,7 +14,7 @@ For `build` and `run`: [SBT].
 
 ```bash
 sbt stage
-./target/universal/stage/bin/front-api -J-javaagent:/path/to/kanela-agent.jar
+./target/universal/stage/bin/front-api -J-javaagent:/path/to/kanela-agent-bundle.jar
 ```
 
 The Front-API will start up on the HTTP port at <http://localhost:9070/>.
@@ -32,9 +32,9 @@ http 'http://localhost:9070/api/front/parallel/search?key-word={some-string}'
 http 'http://localhost:9070/api/front/parallel/details/item/{item-id}/user/{user-id}'
 ```
 
-[SBT]:https://www.scala-sbt.org/
-[Java]:https://www.java.com/es/download/
-[Scala]:https://www.scala-lang.org/
-[Play]:https://www.playframework.com/
-[Kamon]:http://kamon.io
-[Kanela]:http://kamon-io.github.io/kanela/
+[SBT]: https://www.scala-sbt.org/
+[Java]: https://www.java.com/es/download/
+[Scala]: https://www.scala-lang.org/
+[Play]: https://www.playframework.com/
+[Kamon]: http://kamon.io
+[Kanela]: http://kamon-io.github.io/kanela/

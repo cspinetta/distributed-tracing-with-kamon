@@ -1,7 +1,7 @@
 package kamon.demo.tracing.front.service
 
 import javax.inject.{Inject, Singleton}
-import kamon.demo.tracing.front.model.ItemDetails
+import kamon.demo.tracing.front.model.{Item, ItemDetails}
 import kamon.demo.tracing.front.repository.{ItemsRepository, UsersRepository}
 import play.api.MarkerContext
 
@@ -11,7 +11,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ParallelItemsService @Inject()(itemsRepository: ItemsRepository, userRepository: UsersRepository)(implicit ec: ExecutionContext) {
 
   def findByFilter(filter: ItemsFilter, userId: Long)(implicit mc: MarkerContext): Future[ItemsResult] = {
-    val itemsFuture = itemsRepository.search(filter)
+    val itemsFuture: Future[List[Item]] = itemsRepository.search(filter)
     val userFuture = userRepository.findById(userId)
     for {
       items <- itemsFuture

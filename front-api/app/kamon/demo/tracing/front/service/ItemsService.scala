@@ -12,10 +12,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class ItemsService @Inject()(itemsRepository: ItemsRepository, usersRepository: UsersRepository)(implicit ec: ExecutionContext) {
 
   def findByFilter(filter: ItemsFilter, userId: Long)(implicit mc: MarkerContext): Future[ItemsResult] = {
-    for {
-      items <- itemsRepository.search(filter)
-      user <- usersRepository.findById(userId)
-    } yield ItemsResult(items = items, user = user)
+    itemsRepository.search(filter)
+      .flatMap(items => usersRepository.findById(userId)
+        .map(user => ItemsResult(items = items, user = user)))
   }
 
   def details(itemId: Long, userId: Long)(implicit mc: MarkerContext): Future[ItemDetails] = {

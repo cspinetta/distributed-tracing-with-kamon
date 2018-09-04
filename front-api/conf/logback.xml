@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true">
-  <conversionRule conversionWord="K"
-    converterClass="com.despegar.routing.logback.LogbackOptionStringContextKeyConverter" />
+  <conversionRule conversionWord="traceID" converterClass="kamon.logback.LogbackTraceIDConverter" />
 
   <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern><![CDATA[%date %-4level [${HOSTNAME}] [%thread] \(...\)%logger{4} : %msg%n]]></pattern>
+      <pattern><![CDATA[%date %-4level [${HOSTNAME}|%traceID|%thread] \(...\)%logger{4} : %msg%n]]></pattern>
     </encoder>
   </appender>
 
@@ -17,6 +16,4 @@
     <appender-ref ref="async" />
   </root>
 
-
-  <logger name="kamon.demo.tracing" level="DEBUG" />
 </configuration>

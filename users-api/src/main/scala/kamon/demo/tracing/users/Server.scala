@@ -10,7 +10,6 @@ import kamon.demo.tracing.users.api.{HealthService, UsersService}
 import kamon.demo.tracing.users.conf.{ConfigLoader, ConfigSupport}
 import kamon.demo.tracing.users.program.{StatsProgram, UsersProgram}
 import kamon.demo.tracing.users.utils.ThreadUtils._
-import kamon.executors.util.ContextAwareExecutorService
 import kamon.http4s.middleware.client.{KamonSupport => KamonSupportC}
 import kamon.http4s.middleware.server.{KamonSupport => KamonSupportS}
 import org.http4s._
@@ -24,10 +23,10 @@ import scala.concurrent.ExecutionContext
 
 object Server extends StreamApp[IO] with ConfigSupport with Programs with ClientsFactory {
 
-  private val executor: ExecutorService = ContextAwareExecutorService(Executors.newFixedThreadPool(30, namedThreadFactory("user-api-server-pool")))
+  private val executor: ExecutorService = Executors.newFixedThreadPool(30, namedThreadFactory("user-api-server-pool"))
   implicit val ec: ExecutionContext = ExecutionContext.fromExecutor(executor)
 
-  private val statsExecutor = ContextAwareExecutorService(Executors.newFixedThreadPool(8, namedThreadFactory("stats-execution-pool")))
+  private val statsExecutor: ExecutorService = Executors.newFixedThreadPool(8, namedThreadFactory("stats-execution-pool"))
 
   override def stream(args: List[String], requestShutdown: IO[Unit]): Stream[IO, ExitCode] = {
 
@@ -63,7 +62,7 @@ trait Clients {
 
 trait Programs extends Clients {
   def usersProgram(statsProgram: StatsProgram) = new UsersProgram(statsProgram)
-  def statsProgram(ec: ContextAwareExecutorService) = new StatsProgram(ec)
+  def statsProgram(executor: ExecutorService) = new StatsProgram(executor)
 }
 
 trait ClientsFactory extends ConfigSupport {

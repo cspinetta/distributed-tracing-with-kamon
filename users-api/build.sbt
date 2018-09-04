@@ -1,4 +1,6 @@
 
+import com.lightbend.sbt.javaagent.JavaAgent
+
 val artifactId = "users-api"
 
 organization := "io.kamon"
@@ -26,6 +28,11 @@ scalacOptions ++= Seq(
 
 val Http4sVersion   = "0.18.11"
 val CirceVersion    = "0.9.3"
+val KanelaVersion   = "0.0.14"
+
+enablePlugins(JavaAgent)
+
+JavaAgent.JavaAgentKeys.javaAgents += "io.kamon" % "kanela-agent-bundle" % KanelaVersion % "compile;test"
 
 libraryDependencies ++= Seq(
   "org.http4s"              %%  "http4s-blaze-server"     % Http4sVersion,
@@ -35,7 +42,7 @@ libraryDependencies ++= Seq(
   "io.kamon"                %%  "kamon-http4s"            % "1.0.7",
   "io.kamon"                %%  "kamon-zipkin"            % "1.0.0",
   "io.kamon"                %%  "kamon-jaeger"            % "1.0.2",
-  "io.kamon"                %%  "kamon-executors"         % "1.0.0",
+  "io.kamon"                %   "kanela-agent-bundle"     % KanelaVersion             % "provided",
   "ch.qos.logback"          %   "logback-classic"         % "1.2.1",
   "com.github.pureconfig"   %%  "pureconfig"              % "0.7.1",
   "com.zaxxer"              %   "HikariCP"                % "2.6.2",

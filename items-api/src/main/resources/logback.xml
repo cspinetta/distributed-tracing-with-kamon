@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration scan="false" debug="false">
-    <conversionRule conversionWord="traceID" converterClass="kamon.logback.LogbackTraceIDConverter" />
+<configuration scan="true">
+  <conversionRule conversionWord="traceID" converterClass="kamon.logback.LogbackTraceIDConverter" />
 
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} | %-5level | %traceID | %c{0} -> %m%n</pattern>
-        </encoder>
-    </appender>
+  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern><![CDATA[%date %-4level [${HOSTNAME}|%traceID|%thread] \(...\)%logger{4} : %msg%n]]></pattern>
+    </encoder>
+  </appender>
 
-    <appender name="async" class="ch.qos.logback.classic.AsyncAppender">
-        <appender-ref ref="STDOUT"/>
-    </appender>
+  <appender name="async" class="ch.qos.logback.classic.AsyncAppender">
+    <appender-ref ref="console"/>
+  </appender>
 
-    <root level="DEBUG">
-        <appender-ref ref="async"/>
-    </root>
+  <root level="INFO">
+    <appender-ref ref="async" />
+  </root>
+
 </configuration>

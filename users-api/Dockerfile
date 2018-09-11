@@ -7,4 +7,4 @@ WORKDIR /project
 
 EXPOSE 9073
 
-CMD ["java", "-jar", "/project/users-api_2.12-0.0.1-SNAPSHOT-one-jar.jar"]
+CMD ["java", "-Dkamon.zipkin.host=zipkin", "-Dkamon.zipkin.port=9411", "-Dkamon.jaeger.host=jaeger", "-jar", "/project/users-api_2.12-0.0.1-SNAPSHOT-one-jar.jar"]

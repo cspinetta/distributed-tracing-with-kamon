@@ -6,4 +6,4 @@ WORKDIR /project
 
 EXPOSE 9071
 
-CMD export "ITEMS_API_OPTS=-javaagent:/project/kanela-agent-bundle-0.0.14.jar"; /project/bin/items-api
+CMD export "ITEMS_API_OPTS=-javaagent:/project/kanela-agent-bundle-0.0.14.jar -Dservice.sellers-api.host=http://sellers-api:9072 -Dkamon.zipkin.host=zipkin -Dkamon.zipkin.port=9411 -Dkamon.jaeger.host=jaeger"; /project/bin/items-api

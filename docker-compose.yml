@@ -3,22 +3,22 @@ version: '2'
 services:
     front-api:
       build: ./front-api
-      image: damdev/distributed-tracing-with-kamon-front-api:0.0.4
+      image: damdev/distributed-tracing-with-kamon-front-api:0.0.5
       ports:
         - "9070:9070"
     items-api:
       build: ./items-api
-      image: damdev/distributed-tracing-with-kamon-items-api:0.0.4
+      image: damdev/distributed-tracing-with-kamon-items-api:0.0.5
       ports:
         - "9071:9071"
     sellers-api:
       build: ./sellers-api
-      image: damdev/distributed-tracing-with-kamon-sellers-api:0.0.4
+      image: damdev/distributed-tracing-with-kamon-sellers-api:0.0.5
       ports:
         - "9072:9072"
     users-api:
       build: ./users-api
-      image: damdev/distributed-tracing-with-kamon-users-api:0.0.4
+      image: damdev/distributed-tracing-with-kamon-users-api:0.0.5
       ports:
         - "9073:9073"
     jaeger:

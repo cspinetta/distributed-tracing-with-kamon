@@ -18,6 +18,8 @@ Then just send some requests to the `front-api` and go to the tracing server to 
 
 _A docker compose with all APIs and traces servers integrated **is coming!**_
 
+## Playground
+
 ### Interesting use cases
 
 #### Basic example
@@ -44,6 +46,14 @@ http 'http://localhost:9070/api/front/parallel/details/item/15/user/55'
 ```bash
 http 'http://localhost:9070/api/front/parallel/details/item/1500/user/55'
 ```
+
+### Generate a lot of requests
+
+```bash
+./generate-requests.sh 1000 2
+```
+
+It will execute 1000 requests with concurrency 2 per each example url.
 
 [1]: https://slides.com/diegoparra/monitoring-microservices
 [2]: https://zipkin.io/

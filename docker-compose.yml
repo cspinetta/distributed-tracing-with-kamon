@@ -1,0 +1,48 @@
+version: '2'
+
+services:
+    front-api:
+      build: ./front-api
+      image: damdev/distributed-tracing-with-kamon-front-api:0.0.5
+      ports:
+        - "9070:9070"
+    items-api:
+      build: ./items-api
+      image: damdev/distributed-tracing-with-kamon-items-api:0.0.5
+      ports:
+        - "9071:9071"
+    sellers-api:
+      build: ./sellers-api
+      image: damdev/distributed-tracing-with-kamon-sellers-api:0.0.5
+      ports:
+        - "9072:9072"
+    users-api:
+      build: ./users-api
+      image: damdev/distributed-tracing-with-kamon-users-api:0.0.5
+      ports:
+        - "9073:9073"
+    jaeger:
+      image: jaegertracing/all-in-one:latest
+      ports:
+        - "5775:5775/udp"
+        - "6831:6831/udp"
+        - "6832:6832/udp"
+        - "5778:5778"
+        - "16686:16686"
+        - "14268:14268"
+    zipkin:
+      image: openzipkin/zipkin
+      container_name: zipkin
+      # Environment settings are defined here https://github.com/openzipkin/zipkin/tree/1.19.0/zipkin-server#environment-variables
+      environment:
+        - STORAGE_TYPE=mem
+        # Uncomment to disable scribe
+        # - SCRIBE_ENABLED=false
+        # Uncomment to enable self-tracing
+        # - SELF_TRACING_ENABLED=true
+        # Uncomment to enable debug logging
+        # - JAVA_OPTS=-Dlogging.level.zipkin=DEBUG
+      ports:
+        # Port used for the Zipkin UI and HTTP Api
+        - 9411:9411
+        - 9410:9410

@@ -1,5 +1,7 @@
-
 import com.lightbend.sbt.javaagent.JavaAgent
+import com.github.retronym.SbtOneJar._
+
+oneJarSettings
 
 val artifactId = "users-api"
 
